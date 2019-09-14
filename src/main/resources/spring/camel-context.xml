@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <!-- Define a traditional camel context here -->
+    <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+     <restConfiguration component="servlet" bindingMode="auto" />
+ <rest path="/rest">
+    <get uri="/users">
+      <to uri="direct:users"/>
+    </get>
+    <get uri="/users/{userId}">
+      <to uri="direct:bye"/>
+    </get>
+    <post uri="/users" >
+     <param name="body" type="body" description="Test"/>
+      <to uri="direct:post-users"/>
+    </post>
+    <post uri="/user/{userId}" type="com.redhat.User" consumes="application/json">
+      <to uri="direct:post-users"/>
+    </post>
+  </rest>
+  <route>
+    <from uri="direct:post-users"/>
+    <log message="body: ${body}"/>
+    <log message="post param: ${headers}"/>
+    <to uri="bean:myTransformer?method=updateUser"/>
+
+  </route>
+  <route>
+    <from uri="direct:users"/>
+    <log message="body: ${body}"/>
+    <transform>
+      <constant>Hello World</constant>
+    </transform>
+  </route>
+    </camelContext>
+</beans>
