@@ -12,6 +12,7 @@
     <get uri="/users/{userId}">
       <to uri="direct:bye"/>
     </get>
+    <!--
     <post uri="/users" >
      <param name="body" type="body" description="Test"/>
       <to uri="direct:post-users"/>
@@ -19,8 +20,47 @@
     <post uri="/user/{userId}" type="com.redhat.User" consumes="application/json">
       <to uri="direct:post-users"/>
     </post>
-  </rest>
-  <route>
+  -->
+<!--  curl localhost:8080/api/rest/test -X POST -d 'body=hello'-->
+
+  <post uri="/test" >
+    <param name="body" type="body" description="Test"/>
+     <to uri="direct:test"/>
+   </post>
+
+<!--
+  curl localhost:8080/api/rest/test1 -X POST -d '{"hello":"1"}' -H 'Content-type: application/json'
+-->
+  <post uri="/test1" consumes="application/json">
+     <to uri="direct:test"/>
+   </post>
+
+ </rest>
+ <route>
+  <from uri="direct:test"/>
+  <log message="body: ${body}"/>
+  <log message="post param: ${headers}"/>
+  <camel:setHeader headerName="temp">
+    <camel:simple>${body}</camel:simple>
+  </camel:setHeader>
+  <camel:setBody>
+    <simple></simple>
+  </camel:setBody>
+
+  <setHeader headerName="CamelHttpMethod">
+    <constant>GET</constant>
+  </setHeader>
+<inOut uri="http://localhost:3000/users?bridgeEndpoint=true"/>
+<camel:setBody>
+  <camel:simple>${body} - ${header.temp}</camel:simple>
+</camel:setBody>
+<log message="body: ${body}"/>
+
+<to uri="bean:myTransformer?method=test"/>
+
+</route>
+
+ <route>
     <from uri="direct:post-users"/>
     <log message="body: ${body}"/>
     <log message="post param: ${headers}"/>

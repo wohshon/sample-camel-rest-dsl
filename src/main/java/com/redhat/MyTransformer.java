@@ -53,10 +53,16 @@ public class MyTransformer {
         log.info(""+user.getName());
     }
     
+
     //another way is to inject both Exchange and type of Body, sequence does not matter
 
     public void updateUser2(Exchange ex, User user) {
         log.info(""+user.getName());
         log.info(""+ex.getIn().getBody());
-    }    
+    }
+    
+    public void test(Exchange ex) {
+        log.info("processor: "+ex.getIn().getBody());
+        ex.getOut().setBody(ex.getIn().getBody());
+    }
 }
